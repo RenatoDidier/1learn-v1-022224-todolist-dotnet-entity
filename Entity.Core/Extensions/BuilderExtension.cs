@@ -1,4 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Project.Core.Commands;
+using Project.Core.Handlers;
+using Project.Core.Handlers.Contracts;
 using Project.Repository.Data;
 using Project.Shared;
 
@@ -28,6 +31,18 @@ namespace Project.Core.Extensions
             builder.Services.AddTransient<
                     Shared.Context.AtividadeContext.UseCases.Todo.Contracts.IRepository,
                     Repository.Context.AtividadeContext.UseCases.Todo.Repository
+                >();
+        }
+
+        public static void AddHandlers(this WebApplicationBuilder builder)
+        {
+            builder.Services.AddTransient<
+                    IHandler<CriarAtividadeCommand>,
+                    AtividadeHandler
+                >();            
+            builder.Services.AddTransient<
+                    IHandler<EditarAtividadeCommand>,
+                    AtividadeHandler
                 >();
         }
     }

@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Project.Shared.Context.AtividadeContext.Commands;
+using Project.Core.Commands;
+using Project.Core.Handlers.Contracts;
 using Project.Shared.Context.AtividadeContext.Entities;
 using Project.Shared.Context.AtividadeContext.UseCases.Todo.Contracts;
 using Project.Shared.Context.AtividadeContext.ViewModel;
@@ -9,11 +10,19 @@ namespace Project.Core.Controllers
     [ApiController]
     public class AtividadeController : ControllerBase
     {
-        public readonly IRepository _repository;
+        private readonly IRepository _repository;
+        private readonly IHandler<CriarAtividadeCommand> _handlerCriarAtividade;
+        private readonly IHandler<EditarAtividadeCommand> _handlerEditarAtividade;
 
-        public AtividadeController(IRepository repository)
+        public AtividadeController(
+                IRepository repository,
+                IHandler<CriarAtividadeCommand> handlerCriarAtividade,
+                IHandler<EditarAtividadeCommand> handlerEditarAtividade
+            )
         {
             _repository = repository;
+            _handlerCriarAtividade = handlerCriarAtividade;
+            _handlerEditarAtividade = handlerEditarAtividade;
         }
 
         [HttpGet("/")]
@@ -23,42 +32,36 @@ namespace Project.Core.Controllers
         }
 
         [HttpGet("v1/atividade/listar/{id}")]
-        public async Task<AtividadeViewModel?> ChamarAtividadePorIdAsync(
+        public async Task<CommandResult?> ChamarAtividadePorIdAsync(
                 [FromRoute] string id
             )
         {
             Guid guidId = Guid.Parse(id);
+            AtividadeViewModel? dados  = await _repository.GetAtividadePorIdAsync(guidId, new CancellationToken());
+            var retorno = new CommandResult(dados);
 
-            var variavelTeste = await _repository.GetAtividadePorIdAsync(guidId, new CancellationToken());
-            return variavelTeste;
+            return retorno;
         }
 
-        [HttpGet("v1/atividade/validar/{id}")]
-        public async Task<bool> ValidarAtividadePorIdAsync(
-                [FromRoute] string id
+        [HttpPut("v1/atividade/editar")]
+        public async Task<CommandResult> ValidarAtividadePorIdAsync(
+                [FromBody] EditarAtividadeCommand command
             )
         {
-            Guid guidId = Guid.Parse(id);
 
-            var variavelTeste = await _repository.ValidarAtividadePorIdAsync(guidId, new CancellationToken());
+            var retorno = await _handlerEditarAtividade.Handle(command);
 
-            return variavelTeste;
+            return retorno;
         }
 
         [HttpPost("v1/atividade/criar")]
-        public async Task<string> CriarAtividadeAsync(
+        public async Task<CommandResult> CriarAtividadeAsync(
                 [FromBody] CriarAtividadeCommand atividade
             )
         {
-            Atividade novaAtividade = new();
-            novaAtividade.Titulo = atividade.Titulo;
-            novaAtividade.Id = Guid.NewGuid();
-            novaAtividade.DataCriacao = DateTime.Now;
-            novaAtividade.Conclusao = false;
+            var retorno = await _handlerCriarAtividade.Handle(atividade);
 
-            await _repository.CriarAtividadeAsync(novaAtividade, new CancellationToken());
-
-            return "Teste para ver";
+            return retorno;
 
         }
     }

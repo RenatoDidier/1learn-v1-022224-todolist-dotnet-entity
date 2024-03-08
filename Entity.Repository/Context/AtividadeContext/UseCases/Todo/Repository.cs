@@ -13,21 +13,45 @@ namespace Project.Repository.Context.AtividadeContext.UseCases.Todo
         public Repository(AppDbContext context)
             => _context = context;
         
-        public async Task CriarAtividadeAsync(Atividade atividade, CancellationToken cancellationToken)
+        public async Task<bool> CriarAtividadeAsync(string titulo, CancellationToken cancellationToken)
         {
             try
             {
-                var testeVariavel = await _context.Atividades.AddAsync(atividade, cancellationToken);
+                Atividade parametros = new Atividade();
+                parametros.Titulo = titulo;
+                parametros.Conclusao = false;
+                parametros.DataCriacao = DateTime.Now;
+                parametros.Id = Guid.NewGuid();
+
+                var retorno = await _context.Atividades.AddAsync(parametros, cancellationToken);
                 await _context.SaveChangesAsync(cancellationToken);
 
-                Console.WriteLine("Ver debug");
+                return retorno.IsKeySet;
 
             } catch (Exception ex)
             {
                 Console.WriteLine(ex.Message);
+                return false;
             }
         }
 
+        public async Task<bool> EditarAtividadeAsync(Atividade atividade, CancellationToken cancellationToken)
+        {
+            var dadoAlterado = _context.Atividades.First(a => a.Id == atividade.Id);
+            dadoAlterado.Titulo = atividade.Titulo;
+            dadoAlterado.Conclusao = atividade.Conclusao;
+            dadoAlterado.DataUltimaModificacao = DateTime.Now;
+
+            try
+            {
+                await _context.SaveChangesAsync();
+                return true;
+            } catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                return false;
+            }
+        }
 
         public async Task<AtividadeViewModel?> GetAtividadePorIdAsync(Guid id, CancellationToken cancellationToken)
         {
