@@ -7,6 +7,10 @@ namespace Project.Core.Commands
 {
     public class ExcluirAtividadeCommand : Notifiable<Notification>, ICommand
     {
+        public ExcluirAtividadeCommand(string id)
+        {
+            Id = id;
+        }
         public string Id { get; set; }
         public Guid GuidId => Guid.Parse(Id);
 

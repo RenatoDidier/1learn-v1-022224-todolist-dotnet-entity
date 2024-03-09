@@ -8,7 +8,11 @@ namespace Project.Core.Commands
 {
     public class CriarAtividadeCommand : Notifiable<Notification>, ICommand
     {
-        public string Titulo { get; set; } = string.Empty;
+        public CriarAtividadeCommand(string titulo)
+        {
+            Titulo = titulo;
+        }
+        public string Titulo { get; set; }
 
         public void ValidarRecebimentoDados()
         {

@@ -6,6 +6,12 @@ namespace Project.Core.Commands
 {
     public class EditarAtividadeCommand : Notifiable<Notification>, ICommand
     {
+        public EditarAtividadeCommand(string id, bool conclusao, string titulo = null)
+        {
+            Id = id;
+            Titulo = titulo;
+            Conclusao = conclusao;
+        }
         public string Id { get; set; }
         public Guid GuidId => Guid.Parse(Id);
         public string? Titulo { get; set; }
