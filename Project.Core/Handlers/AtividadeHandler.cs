@@ -53,6 +53,7 @@ namespace Project.Core.Handlers
 
                 if (!validarExistenciaAtividade)
                     return new CommandResult(400, "Problema ao editar atividade");
+
             } catch
             {
                 return new CommandResult(500, "Problema ao acessar o banco");

@@ -63,14 +63,15 @@ namespace Project.Repository.Context.AtividadeContext.UseCases.Todo
 
         public async Task<bool> EditarAtividadeAsync(Atividade atividade, CancellationToken cancellationToken)
         {
-            var dadoAlterado = _context.Atividades.First(a => a.Id == atividade.Id);
-            dadoAlterado.Titulo = atividade.Titulo;
+            var dadoAlterado = _context.Atividades.First(a => (a.Id == atividade.Id) && (a.DataExclusao == null));
+            dadoAlterado.Titulo = atividade.Titulo ?? dadoAlterado.Titulo;
             dadoAlterado.Conclusao = atividade.Conclusao;
             dadoAlterado.DataUltimaModificacao = DateTime.Now;
 
             try
             {
                 await _context.SaveChangesAsync();
+
                 return true;
             } catch (Exception ex)
             {
