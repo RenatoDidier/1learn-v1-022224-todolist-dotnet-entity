@@ -47,6 +47,10 @@ namespace Project.Core.Extensions
             builder.Services.AddTransient<
                     IHandler<ExcluirAtividadeCommand>,
                     AtividadeHandler
+                >();            
+            builder.Services.AddTransient<
+                    IHandler<ListarAtividadesCommand>,
+                    AtividadeHandler
                 >();
         }
     }

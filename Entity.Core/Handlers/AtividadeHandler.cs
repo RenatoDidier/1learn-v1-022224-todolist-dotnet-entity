@@ -2,13 +2,15 @@
 using Project.Core.Handlers.Contracts;
 using Project.Shared.Context.AtividadeContext.Entities;
 using Project.Shared.Context.AtividadeContext.UseCases.Todo.Contracts;
+using Project.Shared.Context.AtividadeContext.ViewModel;
 
 namespace Project.Core.Handlers
 {
     public class AtividadeHandler
         : IHandler<CriarAtividadeCommand>,
             IHandler<EditarAtividadeCommand>,
-            IHandler<ExcluirAtividadeCommand>
+            IHandler<ExcluirAtividadeCommand>,
+            IHandler<ListarAtividadesCommand>
     {
         public readonly IRepository _repository;
         public AtividadeHandler(IRepository repository)
@@ -98,5 +100,17 @@ namespace Project.Core.Handlers
             }
         }
 
+        public async Task<CommandResult> Handle(ListarAtividadesCommand command)
+        {
+            try
+            {
+                List<AtividadeViewModel>? resultado = await _repository.ListarAtividadesAsync(command.Titulo, command.Conclusao, new CancellationToken());
+
+                 return new CommandResult(resultado);
+            } catch
+            {
+                return new CommandResult(500, "Problema para acessar ao banco");
+            }
+        }
     }
 }

@@ -13,6 +13,32 @@ namespace Project.Repository.Context.AtividadeContext.UseCases.Todo
         public Repository(AppDbContext context)
             => _context = context;
         
+        public async Task<List<AtividadeViewModel>>? ListarAtividadesAsync(string titulo, bool? conclusao, CancellationToken cancellationToken)
+        {
+            try
+            {
+                var consulta = await _context.Atividades
+                    .Where(a => (string.IsNullOrEmpty(titulo) || a.Titulo.Contains(titulo)) &&
+                            (!conclusao.HasValue || a.Conclusao == conclusao) &&
+                            (a.DataExclusao == null)
+                            )
+                    .Select(a => new AtividadeViewModel
+                    {
+                        Id = a.Id,
+                        Titulo = a.Titulo,
+                        Conclusao = a.Conclusao
+                    })
+                    .AsNoTracking()
+                    .ToListAsync();
+
+                return consulta;
+
+            } catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                return new List<AtividadeViewModel>();
+            }
+        }
         public async Task<bool> CriarAtividadeAsync(string titulo, CancellationToken cancellationToken)
         {
             try

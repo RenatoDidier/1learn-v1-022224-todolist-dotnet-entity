@@ -14,18 +14,21 @@ namespace Project.Core.Controllers
         private readonly IHandler<CriarAtividadeCommand> _handlerCriarAtividade;
         private readonly IHandler<EditarAtividadeCommand> _handlerEditarAtividade;
         private readonly IHandler<ExcluirAtividadeCommand> _handlerExcluirAtividade;
+        private readonly IHandler<ListarAtividadesCommand> _handlerListarAtvidades;
 
         public AtividadeController(
                 IRepository repository,
                 IHandler<CriarAtividadeCommand> handlerCriarAtividade,
                 IHandler<EditarAtividadeCommand> handlerEditarAtividade,
-                IHandler<ExcluirAtividadeCommand> handlerExcluirAtividade
+                IHandler<ExcluirAtividadeCommand> handlerExcluirAtividade,
+                IHandler<ListarAtividadesCommand> handlerListarAtividades
             )
         {
             _repository = repository;
             _handlerCriarAtividade = handlerCriarAtividade;
             _handlerEditarAtividade = handlerEditarAtividade;
             _handlerExcluirAtividade = handlerExcluirAtividade;
+            _handlerListarAtvidades = handlerListarAtividades;
         }
 
         [HttpGet("/")]
@@ -34,8 +37,18 @@ namespace Project.Core.Controllers
             return "Está funcionando";
         }
 
+        [HttpGet("v1/atividade/listar")]
+        public async Task<CommandResult> ListarAtividadesAsync(
+                [FromBody] ListarAtividadesCommand command
+            )
+        {
+            var retorno = await _handlerListarAtvidades.Handle(command);
+
+            return retorno;
+        }
+
         [HttpGet("v1/atividade/listar/{id}")]
-        public async Task<CommandResult?> ChamarAtividadePorIdAsync(
+        public async Task<CommandResult> ChamarAtividadePorIdAsync(
                 [FromRoute] string id
             )
         {
