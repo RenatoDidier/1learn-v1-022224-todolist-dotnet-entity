@@ -7,7 +7,8 @@ namespace Project.Core.Handlers
 {
     public class AtividadeHandler
         : IHandler<CriarAtividadeCommand>,
-            IHandler<EditarAtividadeCommand>
+            IHandler<EditarAtividadeCommand>,
+            IHandler<ExcluirAtividadeCommand>
     {
         public readonly IRepository _repository;
         public AtividadeHandler(IRepository repository)
@@ -76,6 +77,26 @@ namespace Project.Core.Handlers
 
         }
 
+        public async Task<CommandResult> Handle(ExcluirAtividadeCommand command)
+        {
+            command.ValidarRecebimentoDados();
+
+            if (!command.IsValid)
+                return new CommandResult(401, "Erro ao consultar atividade");
+
+            try
+            {
+                var resposta = await _repository.ExcluirAtividadeAsync(command.GuidId, new CancellationToken());
+
+                if (!resposta)
+                    return new CommandResult(401, "Ocorreu um problema ao excluir a atividade");
+
+                return new CommandResult("Atividade excluída com sucesso");
+            } catch
+            {
+                return new CommandResult(500, "Erro para acessar ao banco");
+            }
+        }
 
     }
 }

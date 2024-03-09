@@ -53,19 +53,36 @@ namespace Project.Repository.Context.AtividadeContext.UseCases.Todo
             }
         }
 
+        public async Task<bool> ExcluirAtividadeAsync(Guid Id, CancellationToken cancellationToken)
+        {
+            var dadoAlterado = _context.Atividades.First(a => a.Id == Id);
+            dadoAlterado.DataExclusao = DateTime.Now;
+
+            try
+            {
+                await _context.SaveChangesAsync();
+                return true;
+            } catch (Exception ex) 
+            {
+                Console.WriteLine(ex.Message);
+                return false;
+            }
+        }
+
         public async Task<AtividadeViewModel?> GetAtividadePorIdAsync(Guid id, CancellationToken cancellationToken)
         {
             try
             {
                 var retorno = await _context
                             .Atividades
+                            .Where(a => a.DataExclusao == null && a.Id == id)
                             .Select(a => new AtividadeViewModel
                             {
                                 Id = a.Id,
                                 Titulo = a.Titulo,
                                 Conclusao = a.Conclusao
                             })
-                            .FirstOrDefaultAsync(x => x.Id == id, cancellationToken: cancellationToken);
+                            .FirstOrDefaultAsync(cancellationToken: cancellationToken);
 
                 return retorno;
 
@@ -86,7 +103,8 @@ namespace Project.Repository.Context.AtividadeContext.UseCases.Todo
             {
                 var retorno = await _context
                             .Atividades
-                            .AnyAsync(x => x.Id == id, cancellationToken: cancellationToken);
+                            .Where(a => a.DataExclusao == null && a.Id == id)
+                            .AnyAsync(cancellationToken: cancellationToken);
 
                 return retorno;
 

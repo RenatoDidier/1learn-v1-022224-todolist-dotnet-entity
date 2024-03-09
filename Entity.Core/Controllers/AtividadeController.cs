@@ -13,16 +13,19 @@ namespace Project.Core.Controllers
         private readonly IRepository _repository;
         private readonly IHandler<CriarAtividadeCommand> _handlerCriarAtividade;
         private readonly IHandler<EditarAtividadeCommand> _handlerEditarAtividade;
+        private readonly IHandler<ExcluirAtividadeCommand> _handlerExcluirAtividade;
 
         public AtividadeController(
                 IRepository repository,
                 IHandler<CriarAtividadeCommand> handlerCriarAtividade,
-                IHandler<EditarAtividadeCommand> handlerEditarAtividade
+                IHandler<EditarAtividadeCommand> handlerEditarAtividade,
+                IHandler<ExcluirAtividadeCommand> handlerExcluirAtividade
             )
         {
             _repository = repository;
             _handlerCriarAtividade = handlerCriarAtividade;
             _handlerEditarAtividade = handlerEditarAtividade;
+            _handlerExcluirAtividade = handlerExcluirAtividade;
         }
 
         [HttpGet("/")]
@@ -38,8 +41,11 @@ namespace Project.Core.Controllers
         {
             Guid guidId = Guid.Parse(id);
             AtividadeViewModel? dados  = await _repository.GetAtividadePorIdAsync(guidId, new CancellationToken());
-            var retorno = new CommandResult(dados);
 
+            if (dados == null)
+                return new CommandResult(401, "A atividade não existe");
+
+            var retorno = new CommandResult(dados);
             return retorno;
         }
 
@@ -50,6 +56,16 @@ namespace Project.Core.Controllers
         {
 
             var retorno = await _handlerEditarAtividade.Handle(command);
+
+            return retorno;
+        }
+
+        [HttpDelete("v1/atividade/excluir")]
+        public async Task<CommandResult> ExcluirAtividadeAsync(
+                [FromBody] ExcluirAtividadeCommand command
+            )
+        {
+            var retorno = await _handlerExcluirAtividade.Handle(command);
 
             return retorno;
         }
