@@ -29,10 +29,8 @@ namespace Project.Core.Handlers
             {
                 var retorno = await _repository.CriarAtividadeAsync(command.Titulo, new CancellationToken());
 
-                if (!retorno)
-                    return new CommandResult(400, "Não foi possível cadastrar a sua atividade");
+                return new CommandResult(retorno);
 
-                return new CommandResult("Atividade criada com sucesso");
 
             } catch
             {

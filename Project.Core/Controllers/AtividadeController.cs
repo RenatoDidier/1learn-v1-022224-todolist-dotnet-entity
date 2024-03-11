@@ -37,7 +37,7 @@ namespace Project.Core.Controllers
             return "Está funcionando";
         }
 
-        [HttpGet("v1/atividade/listar")]
+        [HttpPost("v1/atividade/listar")]
         public async Task<CommandResult> ListarAtividadesAsync(
                 [FromBody] ListarAtividadesCommand command
             )
@@ -73,12 +73,14 @@ namespace Project.Core.Controllers
             return retorno;
         }
 
-        [HttpDelete("v1/atividade/excluir")]
+        [HttpDelete("v1/atividade/excluir/{id}")]
         public async Task<CommandResult> ExcluirAtividadeAsync(
-                [FromBody] ExcluirAtividadeCommand command
+                [FromRoute] string id
             )
         {
-            var retorno = await _handlerExcluirAtividade.Handle(command);
+            var commandExcluir = new ExcluirAtividadeCommand(id);
+
+            var retorno = await _handlerExcluirAtividade.Handle(commandExcluir);
 
             return retorno;
         }

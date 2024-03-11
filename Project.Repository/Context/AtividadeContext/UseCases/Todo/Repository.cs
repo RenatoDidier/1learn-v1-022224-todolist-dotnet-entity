@@ -39,25 +39,28 @@ namespace Project.Repository.Context.AtividadeContext.UseCases.Todo
                 return new List<AtividadeViewModel>();
             }
         }
-        public async Task<bool> CriarAtividadeAsync(string titulo, CancellationToken cancellationToken)
+        public async Task<AtividadeViewModel?> CriarAtividadeAsync(string titulo, CancellationToken cancellationToken)
         {
+            Atividade parametros = new Atividade();
+            parametros.Titulo = titulo;
+            parametros.Conclusao = false;
+            parametros.DataCriacao = DateTime.Now;
+            parametros.Id = Guid.NewGuid();
+
+            await _context.Atividades.AddAsync(parametros, cancellationToken);
+
             try
             {
-                Atividade parametros = new Atividade();
-                parametros.Titulo = titulo;
-                parametros.Conclusao = false;
-                parametros.DataCriacao = DateTime.Now;
-                parametros.Id = Guid.NewGuid();
-
-                var retorno = await _context.Atividades.AddAsync(parametros, cancellationToken);
                 await _context.SaveChangesAsync(cancellationToken);
 
-                return retorno.IsKeySet;
+                AtividadeViewModel retorno = new AtividadeViewModel(parametros);
+
+                return retorno;
 
             } catch (Exception ex)
             {
                 Console.WriteLine(ex.Message);
-                return false;
+                return new AtividadeViewModel();
             }
         }
 
