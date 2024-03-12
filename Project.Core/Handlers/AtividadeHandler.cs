@@ -70,7 +70,7 @@ namespace Project.Core.Handlers
                 if (!resultado)
                     return new CommandResult(400, "Problema ao editar atividade");
 
-                return new CommandResult(parametros);
+                return new CommandResult("Atividade alterada com sucesso");
             } catch
             {
                 return new CommandResult(500, "Problema ao consultar o banco");
