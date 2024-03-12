@@ -6,12 +6,19 @@ namespace Project.Tests.Repository
 {
     public class FakeAtividadeRepository : IRepository
     {
-        public Task<bool> CriarAtividadeAsync(string titulo, CancellationToken cancellationToken)
+        public Task<AtividadeViewModel> CriarAtividadeAsync(string titulo, CancellationToken cancellationToken)
         {
             if (titulo == null)
-                return Task.FromResult(false);
+            {
+                var atividade = new AtividadeViewModel();
+                atividade.Id = Guid.NewGuid();
+                atividade.Titulo = "Retorno Atividade";
+                atividade.Conclusao = false;
+                return Task.FromResult(atividade);
 
-            return Task.FromResult(true);
+            }
+
+            return Task.FromResult(new AtividadeViewModel());
         }
 
         public Task<bool> EditarAtividadeAsync(Atividade parametros, CancellationToken cancellationToken)
